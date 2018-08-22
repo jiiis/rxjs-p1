@@ -1,35 +1,54 @@
 import {Observable} from "rxjs/Observable";
-import {Observer, Subscription} from "rxjs/Rx";
+import {Observer, Subject, Subscription} from "rxjs/Rx";
 import 'rxjs/add/operator/share';
 import {addItem} from "./utils";
 
-const observable: Observable<string> = Observable.create((observer: Observer<string>) => {
-    try {
-        observer.next('How are you?');
+////////// Observable and Observer //////////
+// const observable: Observable<string> = Observable.create((observer: Observer<string>) => {
+//     try {
+//         observer.next('How are you?');
+//
+//         setInterval(() => {
+//             observer.next('I am good!');
+//         },2000);
+//
+//         // observer.complete();
+//     } catch(error) {
+//         observer.error(error.message);
+//     }
+// }).share();
+//
+// const subscription: Subscription = observable.subscribe(
+//     (item: string) => addItem(item),
+//     (error: string) => addItem(error),
+//     () => addItem('Completed!')
+// );
+//
+// setTimeout(() => {
+//     const subscription3: Subscription = observable.subscribe((item: string) => addItem(`From subscription 3: ${item}`));
+// }, 1000);
+//
+// const subscription2: Subscription = observable.subscribe((item: string) => addItem(`From subscription 2: ${item}`));
+//
+// // Adds a tear down to be called during the unsubscribe() of this Subscription.
+// subscription.add(subscription2);
+//
+// setTimeout(() => subscription.unsubscribe(), 6000);
 
-        setInterval(() => {
-            observer.next('I am good!');
-        },2000);
+////////// Subject //////////
+// class Subject<T> extends Observable implements SubscriptionLike
+const subject = new Subject;
 
-        // observer.complete();
-    } catch(error) {
-        observer.error(error.message);
-    }
-}).share();
+// A subject acts like an observable as we can subscribe to it.
+const subscription1 = subject.subscribe((item: string) => addItem(`Subject subscription 1: ${item}`));
 
-const subscription: Subscription = observable.subscribe(
-    (item: string) => addItem(item),
-    (error: string) => addItem(error),
-    () => addItem('Completed!')
-);
+// A subject acts like an observer too.
+subject.next('first');
 
-setTimeout(() => {
-    const subscription3: Subscription = observable.subscribe((item: string) => addItem(`From subscription 3: ${item}`));
-}, 1000);
+const subscription2 = subject.subscribe((item: string) => addItem(`Subject subscription 2: ${item}`));
 
-const subscription2: Subscription = observable.subscribe((item: string) => addItem(`From subscription 2: ${item}`));
+subject.next('second');
 
-// Adds a tear down to be called during the unsubscribe() of this Subscription.
-subscription.add(subscription2);
+subscription2.unsubscribe();
 
-setTimeout(() => subscription.unsubscribe(), 6000);
+subject.next('third');
